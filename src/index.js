@@ -1,4 +1,4 @@
-import R from 'ramda';
+const R = require('ramda');
 
 function lens(getter, setter, path) {
   const focus = R.lensPath(path);
@@ -10,7 +10,7 @@ function lens(getter, setter, path) {
   };
 }
 
-export default function stateLens(state = {}) {
+module.exports = function stateLens(state = {}) {
   return lens(
     () => state,
     update => { state = update(state); },
