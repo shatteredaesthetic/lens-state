@@ -28,7 +28,7 @@ function sLens(getter, setter, adder, path) {
   function view() {
     return R.clone(R.view(focus, getter()));
   }
-  function look(path2) {
+  function look(...path2) {
     path2 = _path(path2);
     return R.clone(R.view(R.lensPath(R.concat(path, path2)), getter()));
   }
@@ -38,7 +38,7 @@ function sLens(getter, setter, adder, path) {
   function over(fn) {
     return R.pipe(R.over(focus), setter)(fn);
   }
-  function lens(path2) {
+  function lens(...path2) {
     path2 = _path(path2);
     return sLens(getter, setter, adder, R.concat(path, path2));
   }
@@ -58,5 +58,11 @@ const extend = R.curry((extension, state) => {
 });
 
 function _path(path) {
-  return Array.isArray(path) ? path : R.split('.', path);
+  return path.length > 1 && Array.isArray(path)
+    ? path
+    : typeof path[0] === 'number'
+        ? path
+        : typeof path[0] === 'string'
+            ? path[0].split('.')
+            : Array.isArray(path[0]) ? path[0] : path;
 }

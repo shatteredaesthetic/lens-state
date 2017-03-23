@@ -80,13 +80,13 @@ test('stateLens - array access', t => {
   t.equal(cLens.view()[0], 2);
   t.equal(state.look(['b', 'c', 2]), 4);
 
-  const fLens = state.lens(['e', 0, 'f']);
+  const fLens = state.lens('e', 0, 'f');
   t.equal(fLens.view(), 6);
 
   fLens.set(3);
   fLens.over(n => n * n);
   t.equal(fLens.view(), 9);
-  t.equal(state.look(['e', 1, 'g']), 7);
+  t.equal(state.look('e', 1, 'g'), 7);
 
   t.end();
 });
