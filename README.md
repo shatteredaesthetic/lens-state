@@ -26,18 +26,18 @@ console.log(bLens.view()) // 0
 
 bLens.set(10)
 console.log(bLens.view()) // 10
-console.log(state.look(['a', 'b'])) // 10
+console.log(state.look('a.b')) // 10
 
 bLens.over(n => n + 1);
 console.log(bLens.view()) // 11
 
 //extend state
 state.extend({ c: 1 });
-console.log(state.look(['c'])) // 1
+console.log(state.look('c')) // 1
 
 //extend doesn't overwrite existing keys
 state.extend({ a:false, d:2 });
-console.log(state.look(['a'])) // { b: 11 }
+console.log(state.look('a')) // { b: 11 }
 ```
 
 ## API
@@ -68,11 +68,21 @@ Passes the focused portion of the current state to the provided function `f`, re
 
 Returns a deep copy of the focused portion of the current state.
 
+### state.look(path)
+
+([number | string] | string) -> Focus
+
+Returns a deep copy of the focused portion, plus the `path`, of the current state.
+
+A single string can be multiple keys seperated by a `.`.
+
 ### state.lens(path)
 
-([number | string]) -> StateLens
+([number | string] | string) -> StateLens
 
 Takes a new focus parameter, and returns a new lens focused on the concatenation of the original lenses path with the newly provided `path`.
+
+A single string can be multiple keys seperated by a `.`.
 
 ### state.extend(extObject)
 

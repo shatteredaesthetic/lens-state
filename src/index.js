@@ -14,6 +14,7 @@ function stateLens(state = {}) {
 }
 
 function sLens(getter, setter, adder, path) {
+  path = _path(path);
   const focus = R.lensPath(path);
   return {
     view,
@@ -28,6 +29,7 @@ function sLens(getter, setter, adder, path) {
     return R.clone(R.view(focus, getter()));
   }
   function look(path2) {
+    path2 = _path(path2);
     return R.clone(R.view(R.lensPath(R.concat(path, path2)), getter()));
   }
   function set(value) {
@@ -37,6 +39,7 @@ function sLens(getter, setter, adder, path) {
     return R.pipe(R.over(focus), setter)(fn);
   }
   function lens(path2) {
+    path2 = _path(path2);
     return sLens(getter, setter, adder, R.concat(path, path2));
   }
   function extend(extension) {
@@ -53,3 +56,7 @@ const extend = R.curry((extension, state) => {
   });
   return Object.assign({}, state, added);
 });
+
+function _path(path) {
+  return Array.isArray(path) ? path : R.split('.', path);
+}
