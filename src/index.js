@@ -5,7 +5,9 @@ module.exports = stateLens;
 function stateLens(state = {}) {
   return sLens(
     () => state,
-    update => { state = update(state); },
+    update => {
+      state = update(state);
+    },
     extend,
     []
   );
@@ -25,9 +27,8 @@ function sLens(getter, setter, adder, path) {
   function view() {
     return R.clone(R.view(focus, getter()));
   }
-  function look(path2){
-    return R.clone(R.view(R.lensPath(R.concat(path, path2)),
-                          getter()));
+  function look(path2) {
+    return R.clone(R.view(R.lensPath(R.concat(path, path2)), getter()));
   }
   function set(value) {
     return R.pipe(R.set(focus), setter)(value);
@@ -35,7 +36,7 @@ function sLens(getter, setter, adder, path) {
   function over(fn) {
     return R.pipe(R.over(focus), setter)(fn);
   }
-  function lens(path2){
+  function lens(path2) {
     return sLens(getter, setter, adder, R.concat(path, path2));
   }
   function extend(extension) {

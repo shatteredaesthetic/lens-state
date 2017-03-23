@@ -4,7 +4,7 @@ import stateLens from './src';
 
 test('stateLens - simple state', t => {
   const state = stateLens({ x: 1 });
-  const x = state.lens(["x"]);
+  const x = state.lens(['x']);
   t.equal(x.view(), 1);
   t.equal(state.look(['x']), 1);
 
@@ -33,8 +33,8 @@ test('stateLens - nested state', t => {
       d: 2
     }
   });
-  const cLens = state.lens(["c"]);
-  const dLens = cLens.lens(["d"]);
+  const cLens = state.lens(['c']);
+  const dLens = cLens.lens(['d']);
 
   t.equal(state.look(['c', 'd']), 2);
   spok(t, cLens.view(), {
@@ -45,22 +45,22 @@ test('stateLens - nested state', t => {
   t.equal(dLens.view(), 2);
 
   dLens.set(4);
-  cLens.lens(["inner"]).set(false);
+  cLens.lens(['inner']).set(false);
   t.equal(state.look(['c', 'd']), 4);
   spok(t, cLens.view(), {
     inner: false,
-    d:4
+    d: 4
   });
 
   dLens.over(n => n * 5);
-  cLens.lens(["inner"]).over(x => !x);
+  cLens.lens(['inner']).over(x => !x);
   t.equal(state.look(['c', 'd']), 20);
   spok(t, cLens.view(), {
     inner: true,
     d: 20
   });
 
-  const bLens = state.lens(["b"]);
+  const bLens = state.lens(['b']);
   bLens.over(s => `${s}!`);
   t.equal(bLens.view(), 'test!');
 
@@ -74,16 +74,13 @@ test('stateLens - array access', t => {
       c: [2, 3, 4],
       d: 5
     },
-    e: [
-      { f: 6 },
-      { g: 7 }
-    ]
+    e: [{ f: 6 }, { g: 7 }]
   });
-  const cLens = state.lens(["b", "c"]);
+  const cLens = state.lens(['b', 'c']);
   t.equal(cLens.view()[0], 2);
   t.equal(state.look(['b', 'c', 2]), 4);
 
-  const fLens = state.lens(["e", 0, "f"]);
+  const fLens = state.lens(['e', 0, 'f']);
   t.equal(fLens.view(), 6);
 
   fLens.set(3);
@@ -114,7 +111,7 @@ test('stateLens - extend', t => {
     c: 2
   });
 
-  b.extend({d:3,e:4});
+  b.extend({ d: 3, e: 4 });
   const d = b.lens(['d']);
   d.over(n => n * n);
   spok(t, b.view(), {
