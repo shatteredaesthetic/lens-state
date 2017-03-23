@@ -1,6 +1,6 @@
 {
   "name": "lens-state",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "takes an initial state and returns an extensible lens",
   "main": "lib/index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "javascript"
   ],
   "author": "Jason Polhemus <shatteredaesthethic@gmail.com>",
+  "repository": "shatteredaesthetic/lens-state",
   "license": "MIT",
   "peerDependencies": {
     "ramda": "*"

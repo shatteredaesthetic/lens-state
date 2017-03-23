@@ -1,23 +1,54 @@
 const R = require('ramda');
 
-function lens(getter, setter, path) {
-  const focus = R.lensPath(path);
-  return {
-    view: (path2 = null) => (
-      path2
-        ? R.clone(R.view(R.lensPath(R.concat(path, path2)), getter()))
-        : R.clone(R.view(focus, getter()))
-    ),
-    set: R.pipe(R.set(focus), setter),
-    over: R.pipe(R.over(focus), setter),
-    sub: path2 => lens(getter, setter, R.concat(path, path2))
-  };
-}
+module.exports = stateLens;
 
-module.exports = function stateLens(state = {}) {
-  return lens(
+function stateLens(state = {}) {
+  return sLens(
     () => state,
     update => { state = update(state); },
+    extend,
     []
   );
 }
+
+function sLens(getter, setter, adder, path) {
+  const focus = R.lensPath(path);
+  return {
+    view,
+    look,
+    set,
+    over,
+    lens,
+    extend
+  };
+
+  function view() {
+    return R.clone(R.view(focus, getter()));
+  }
+  function look(path2){
+    return R.clone(R.view(R.lensPath(R.concat(path, path2)),
+                          getter()));
+  }
+  function set(value) {
+    return R.pipe(R.set(focus), setter)(value);
+  }
+  function over(fn) {
+    return R.pipe(R.over(focus), setter)(fn);
+  }
+  function lens(path2){
+    return sLens(getter, setter, adder, R.concat(path, path2));
+  }
+  function extend(extension) {
+    return over(adder(extension));
+  }
+}
+
+const extend = R.curry((extension, state) => {
+  let added = {};
+  Object.keys(extension).forEach(key => {
+    if (!~Object.keys(state).indexOf(key)) {
+      added[key] = extension[key];
+    }
+  });
+  return Object.assign({}, state, added);
+});
