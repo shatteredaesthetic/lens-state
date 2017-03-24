@@ -1,6 +1,6 @@
 {
   "name": "lens-state",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "takes an initial state and returns an extensible lens",
   "main": "lib/index.js",
   "scripts": {
