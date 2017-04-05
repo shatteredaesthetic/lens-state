@@ -1,5 +1,6 @@
 import test from 'tape';
 import spok from 'spok';
+import R from 'ramda';
 import stateLens from './src';
 
 test('stateLens - simple state', t => {
@@ -40,16 +41,16 @@ test('stateLens - nested state', t => {
 
   t.equal(state.show('c.d'), 2);
 
-  state.evolve(4, 'c.d');
-  state.evolve(false, 'c.inner');
+  state.evolve(4, 'c.d')
+       .evolve(false, 'c.inner');
   t.equal(state.show('c.d'), 4);
   spok(t, state.show('c'), {
     inner: false,
     d: 4
   });
 
-  state.evolve(n => n * 5, 'c.d');
-  state.evolve(x => !x, 'c.inner');
+  state.evolve(n => n * 5, 'c.d')
+       .evolve(x => !x, 'c.inner');
   t.equal(state.show('c.d'), 20);
   spok(t, state.show('c'), {
     inner: true,
@@ -77,8 +78,8 @@ test('stateLens - array access', t => {
   const fLens = ['e', 0, 'f'];
   t.equal(state.show(fLens), 6);
 
-  state.evolve(3, fLens);
-  state.evolve(n => n * n, fLens);
+  state.evolve(3, fLens)
+       .evolve(n => n * n, fLens);
   t.equal(state.show(fLens), 9);
   t.equal(state.show('e', 1, 'g'), 7);
 
@@ -86,7 +87,7 @@ test('stateLens - array access', t => {
 });
 
 test('stateLens - extend', t => {
-  const state = stateLens({});
+  const state = stateLens();
   state.extend({ a: 1 });
   spok(t, state.show(), {
     a: 1
@@ -104,8 +105,8 @@ test('stateLens - extend', t => {
     c: 2
   });
 
-  state.extend({ d: 3, e: 4 }, 'b');
-  state.evolve(n => n * n, 'b.d');
+  state.extend({ d: 3, e: 4 }, 'b')
+       .evolve(n => n * n, 'b.d');
   spok(t, state.show('b'), {
     c: 2,
     d: 9,

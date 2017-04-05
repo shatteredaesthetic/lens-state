@@ -1,5 +1,7 @@
 # LensState
 
+### This is a major breaking change to the API, as in it's completely different. Shouldn't change too much now, though
+
 LensState is a tiny lib that uses the `Ramda` library, to provide a lens structure that is useful for state manipulations.
 
 ## Installation
@@ -36,6 +38,10 @@ console.log(state.show('c', 2)) // 9
 //extend doesn't overwrite existing keys
 state.extend({ a:false, d:2 });
 console.log(state.show('a')) // { b: 11 }
+
+//methods are chainable
+state.extend({ e: null }).evolve(9, 'e').evolve(Math.sqrt, 'e')
+console.log(state.show('e'))  // 3
 ```
 
 ## API
@@ -66,7 +72,7 @@ A single string can be multiple keys seperated by a `.`.
 
 (object, ...[number | string]) -> void
 
-Takes an object (`extObject`) of new key/value pairs, and adds it to the state at the level of the `path`. Does not overwrite existing keys.
+Takes an object (`extObject`) of new key/value pairs, and adds it to the state at the level of the `path`. Does not overwrite existing keys. `path` must lead to an object within the state.
 
 ___
 *heavily inspired by beezee's [statelens](https://github.com/beezee/statelens)*

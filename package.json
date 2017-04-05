@@ -4,13 +4,10 @@
   "description": "takes an initial state and returns an extensible lens",
   "main": "lib/index.js",
   "scripts": {
-    "build": "rimraf lib/* && babel src -d lib",
-    "test": "tape -r babel-register test.js"
-  },
-  "browserify": {
-    "transform": [
-      "babelify"
-    ]
+    "build:full" : "rimraf lib/* && babel src -d lib",
+    "build:min" : "google-closure-compiler-js src/index.js > lib/index.min.js",
+    "build" : "npm run build:full && npm run build:min",
+    "test" : "tape -r babel-register test.js"
   },
   "keywords": [
     "lens",

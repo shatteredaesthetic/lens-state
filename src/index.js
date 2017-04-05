@@ -20,15 +20,19 @@ function stateLens(state = {}) {
     },
     []
   );
-  return {
+
+  const returnObj = {
     show,
     extend,
     evolve
   };
 
+  return returnObj;
+
   function evolve(x, ...path) {
     const l = m.lens(path);
-    return typeof x === 'function' ? l.over(x) : l.set(x);
+    typeof x === 'function' ? l.over(x) : l.set(x);
+    return returnObj;
   }
 
   function show(...path) {
@@ -36,7 +40,7 @@ function stateLens(state = {}) {
   }
 
   function extend(extension, ...path) {
-    return evolve(_extend(extension), path);
+    return evolve(_extend(extension), ...path);
   }
 }
 
