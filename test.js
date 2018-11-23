@@ -1,69 +1,71 @@
-import test from 'tape';
-import spok from 'spok';
-import R from 'ramda';
-import stateLens from './src';
+import test from "tape";
+import spok from "spok";
+import R from "ramda";
+import stateLens from "./src";
 
-test('stateLens - simple state', t => {
+test("stateLens - simple state", t => {
   const state = stateLens({ x: 1 });
-  t.equal(state.show('x'), 1);
+  t.equal(state.goto("x").show(), 1);
 
   spok(t, state.show(), {
     x: 1
   });
 
-  state.evolve(10, 'x');
+  state.evolve(10);
   spok(t, state.show(), {
     x: 10
   });
 
-  state.evolve(n => n / 5, 'x');
+  state.evolve(n => n / 5);
   spok(t, state.show(), {
     x: 2
   });
   t.end();
 });
 
-test('stateLens - nested state', t => {
+test("stateLens - nested state", t => {
   const state = stateLens({
     a: 1,
-    b: 'test',
+    b: "test",
     c: {
       inner: true,
       d: 2
     }
   });
+  const lens1 = state.goto("c.d");
+  const lens2 = state.goto("c.inner");
 
-  t.equal(state.show('c.d'), 2);
-  spok(t, state.show('c'), {
+  t.equal(lens1.show(), 2);
+  spok(t, state.goto("c").show(), {
     inner: true,
     d: 2
   });
 
-  t.equal(state.show('c.d'), 2);
+  t.equal(lens1.show(), 2);
 
-  state.evolve(4, 'c.d')
-       .evolve(false, 'c.inner');
-  t.equal(state.show('c.d'), 4);
-  spok(t, state.show('c'), {
+  lens1.evolve(4);
+  lens2.evolve(false);
+  t.equal(lens1.show(), 4);
+  spok(t, state.goto("c").show(), {
     inner: false,
     d: 4
   });
 
-  state.evolve(n => n * 5, 'c.d')
-       .evolve(x => !x, 'c.inner');
-  t.equal(state.show('c.d'), 20);
-  spok(t, state.show('c'), {
+  lens1.evolve(n => n * 5);
+  lens2.evolve(x => !x);
+  t.equal(lens1.show(), 20);
+  spok(t, state.goto("c").show(), {
     inner: true,
     d: 20
   });
 
-  state.evolve(s => `${s}!`, 'b');
-  t.equal(state.show('b'), 'test!');
+  state.lens("b").evolve(s => `${s}!`);
+  t.equal(state.goto("b").show(), "test!");
 
   t.end();
 });
 
-test('stateLens - array access', t => {
+test("stateLens - array access", t => {
   const state = stateLens({
     a: 1,
     b: {
@@ -72,21 +74,20 @@ test('stateLens - array access', t => {
     },
     e: [{ f: 6 }, { g: 7 }]
   });
-  t.equal(state.show('b', 'c', 0), 2);
-  t.equal(state.show('b', 'c', 2), 4);
+  t.equal(state.goto(["b", "c", 0]).show(), 2);
+  t.equal(state.goto(["b", "c", 2]).show(), 4);
 
-  const fLens = ['e', 0, 'f'];
-  t.equal(state.show(fLens), 6);
+  const lens3 = state.goto(["e", 0, "f"]);
+  t.equal(lens3.show(), 6);
 
-  state.evolve(3, fLens)
-       .evolve(n => n * n, fLens);
-  t.equal(state.show(fLens), 9);
-  t.equal(state.show('e', 1, 'g'), 7);
+  lens3.evolve(3).evolve(n => n * n);
+  t.equal(lens3.show(), 9);
+  t.equal(state.goto(["e", 1, "g"]).show(), 7);
 
   t.end();
 });
 
-test('stateLens - extend', t => {
+test("stateLens - extend", t => {
   const state = stateLens();
   state.extend({ a: 1 });
   spok(t, state.show(), {
@@ -101,18 +102,21 @@ test('stateLens - extend', t => {
     }
   });
 
-  spok(t, state.show('b'), {
+  spok(t, state.goto("b").show(), {
     c: 2
   });
 
-  state.extend({ d: 3, e: 4 }, 'b')
-       .evolve(n => n * n, 'b.d');
-  spok(t, state.show('b'), {
+  const lens4 = state.goto("b");
+  lens4
+    .extend({ d: 3, e: 4 })
+    .goto("d")
+    .evolve(n => n * n);
+  spok(t, lens4.show(), {
     c: 2,
     d: 9,
     e: 4
   });
-  t.equal(state.show('b.e'), 4);
+  t.equal(state.goto("b.e").show(), 4);
 
   t.end();
 });
