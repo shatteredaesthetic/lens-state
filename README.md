@@ -43,7 +43,7 @@ console.log(view(_.e))  // 3
 
 ## API
 
-### const S = stateLens(stateObj);
+### const { \_, evolve, extend, view } = stateLens(stateObj);
 
 Sets the state to the `stateObj`. The provided constructor returns an object with our getter (`view`), our setter (`evolve`), a lensProzy saved under `_`, and a way to `extend` the state.
 
