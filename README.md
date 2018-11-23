@@ -2,7 +2,7 @@
 
 ### This is a major breaking change to the API, as in it's completely different. Shouldn't change too much now, though
 
-LensState is a tiny lib that uses the `Ramda` library, to provide a lens structure that is useful for state manipulations.
+LensState is a tiny lib that uses the `focused` library to provide an encapsulated state, with mutations controlled through lenses.
 
 ## Installation
 
@@ -11,68 +11,63 @@ Install via npm
 ```
 npm i -S lens-state
 ```
+
 ### Usage
 
-LensState provides a single constructor function which takes one parameter, an initial state object.
+LensState provides a single constructor function which takes one parameter, an initial state object, defaulted to an empty object.
 
 #### Example
 
 ```
 var statelens = require('lens-state');
 
-var state = statelens({a: {b: 0}});
+const { _, evolve, extend, view } = statelens({a: {b: 0}});
 
 // immutable read
-console.log(state.show('a.b')) // 0
+console.log(view(_.a.b)) // 0
 
-state.evolve(10, 'a.b');
-console.log(state.show('a.b')) // 10
+evolve(_.a.b, 10);
+console.log(view(_.a.b)) // 10
 
-state.evolve(n => n + 1, 'a.b');
-console.log(state.show('a.b')) // 11
+evolve(_.a.b, n => n + 1);
+console.log(view(_.a.b)) // 11
 
 //extend state
-state.extend({ c: [7, 8, 9] });
-console.log(state.show('c', 2)) // 9
-
-//extend doesn't overwrite existing keys
-state.extend({ a:false, d:2 });
-console.log(state.show('a')) // { b: 11 }
+extend({ c: [7, 8, 9] });
+console.log(view(_.c[2])) // 9
 
 //methods are chainable
-state.extend({ e: null }).evolve(9, 'e').evolve(Math.sqrt, 'e')
-console.log(state.show('e'))  // 3
+extend({ e: null }).evolve(_.e, 9).evolve(_.e, Math.sqrt)
+console.log(view(_.e))  // 3
 ```
 
 ## API
 
 ### const S = stateLens(stateObj);
 
-(A) -> StateLens
+Sets the state to the `stateObj`. The provided constructor returns an object with our getter (`view`), our setter (`evolve`), a lensProzy saved under `_`, and a way to `extend` the state.
 
-Sets the state to the `stateObj`. The provided constructor returns a lens object with four functions on it.
+### \_
 
-### S.evolve(x, path)
+Used to create lenses into the state object. For more information on creating lenses, please see the `focused` [documentation](https://github.com/yelouafi/focused).
 
-(A | Fn, ...[number | string]) -> void
+### evolve(lens, valOrFn)
 
-If `x` is a value, replaces the focus of the current lens at the `path` with the provided value `x`, and passes the resulting state to the lenses Setter.
+If `valOrFn` is a value, replaces the focus of the current `lens` with the provided value.
 
-If `x` is a function, passes the focused portion of the current `path` to the provided function `x`, replaces the focus of the current `path` with the result, and passes the resulting state to the lenses Setter.
+If `valOrFn` is a function, passes the focused portion of the current `lens` to the provided function, replacing it with the result.
 
-### S.show(path)
+### view(lens)
 
-(...[number | string]) -> Focus
+Returns a deep copy of the `lens` into the current state.
 
-Returns a deep copy of the focused portion, plus the `path`, of the current state.
+### extend(extObject)
 
-A single string can be multiple keys seperated by a `.`.
+Takes an object (`extObject`) of new key/value pairs, and adds it to the state. Returns a TypeError if `extObject` isn't an object.
 
-### S.extend(extObject, path)
+---
 
-(object, ...[number | string]) -> void
+_heavily inspired by:_
 
-Takes an object (`extObject`) of new key/value pairs, and adds it to the state at the level of the `path`. Does not overwrite existing keys. `path` must lead to an object within the state.
-
-___
-*heavily inspired by beezee's [statelens](https://github.com/beezee/statelens)*
+- _beezee's [statelens](https://github.com/beezee/statelens)_
+- _yelouafi's [focused](https://github.com/yelouafi/focused)_
