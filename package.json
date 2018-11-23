@@ -1,7 +1,7 @@
 {
   "name": "lens-state",
-  "version": "1.0.0",
-  "description": "takes an initial state and returns an extensible lens",
+  "version": "2.0.0",
+  "description": "encapsulates a state object, wth access through lenses",
   "main": "lib/index.js",
   "scripts": {
     "build:full": "rimraf lib/* && babel src -d lib",
@@ -17,11 +17,10 @@
   "repository": "shatteredaesthetic/lens-state",
   "license": "MIT",
   "peerDependencies": {
-    "ramda": "*"
+    "focused": "*"
   },
   "dependencies": {
-    "focused": "^0.4.0",
-    "ramda": "^0.23.0"
+    "focused": "^0.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
