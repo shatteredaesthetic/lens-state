@@ -1,80 +1,26 @@
-const R = require('ramda');
+const { lensProxy, over, set, view } = require("focused");
 
-const _extend = R.curry((extension, state) => {
-  let added = {};
-  Object.keys(extension).forEach(key => {
-    if (!~Object.keys(state).indexOf(key)) {
-      added[key] = extension[key];
+module.exports = function(initialState = {}) {
+  let state = initialState;
+
+  const obj = {
+    _: lensProxy(),
+    evolve: (lens, valOrFn) =>
+      typeof valOrFn === "function"
+        ? ((state = over(lens, valOrFn, state)), obj)
+        : ((state = set(lens, valOrFn, state)), obj),
+    view: lens => view(lens, state),
+    extend: _extend
+  };
+  return obj;
+
+  function _extend(extra) {
+    if (typeof extra === "object") {
+      state = Object.assign({}, state, extra);
+      return obj;
+    } else {
+      throw new TypeError("the parameter must be an object");
+      return obj;
     }
-  });
-  return Object.assign({}, state, added);
-});
-
-module.exports = stateLens;
-
-function stateLens(state = {}) {
-  const m = sLens(
-    () => state,
-    update => {
-      state = update(state);
-    },
-    []
-  );
-
-  const returnObj = {
-    show,
-    extend,
-    evolve
-  };
-
-  return returnObj;
-
-  function evolve(x, ...path) {
-    const l = m.lens(path);
-    typeof x === 'function' ? l.over(x) : l.set(x);
-    return returnObj;
   }
-
-  function show(...path) {
-    return m.lens(path).view();
-  }
-
-  function extend(extension, ...path) {
-    return evolve(_extend(extension), ...path);
-  }
-}
-
-function sLens(getter, setter, path) {
-  path = _path(path);
-  const focus = R.lensPath(_path(path));
-  return {
-    view,
-    set,
-    over,
-    lens
-  };
-
-  function view() {
-    return R.clone(R.view(focus, getter()));
-  }
-  function set(value) {
-    return R.pipe(R.set(focus), setter)(value);
-  }
-  function over(fn) {
-    return R.pipe(R.over(focus), setter)(fn);
-  }
-  function lens(...path2) {
-    path2 = _path(path2);
-    return sLens(getter, setter, R.concat(path, path2));
-  }
-}
-
-function _path(path) {
-  return path.length > 1 && Array.isArray(path)
-    ? path
-    : typeof path[0] === 'number'
-        ? path
-        : typeof path[0] === 'string'
-            ? path[0].split('.')
-            : Array.isArray(path[0]) ? path[0] : path;
-}
+};

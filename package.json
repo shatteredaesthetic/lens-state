@@ -20,6 +20,7 @@
     "ramda": "*"
   },
   "dependencies": {
+    "focused": "^0.4.0",
     "ramda": "^0.23.0"
   },
   "devDependencies": {
